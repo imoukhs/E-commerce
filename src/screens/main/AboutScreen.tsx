@@ -70,7 +70,8 @@ export default function AboutScreen({ navigation }: Props) {
               resizeMode="contain"
             />
             <Text style={styles.appName}>
-              Your App Name
+              RUN
+              MarketPlace
             </Text>
             <Text style={styles.version}>
               Version 1.0.0

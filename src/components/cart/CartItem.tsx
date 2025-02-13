@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, Surface } from 'react-native';
 import { Text, IconButton, useTheme } from 'react-native-paper';
 import { spacing } from '../../theme/spacing';
 import type { CustomTheme } from '../../theme/types';
@@ -34,53 +34,59 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <View style={styles.details}>
-        <Text 
-          style={[theme.typography.bodyLarge, { color: theme.colors.onSurface }]} 
-          numberOfLines={2}
-        >
-          {item.name}
-        </Text>
-        <Text 
-          style={[theme.typography.titleMedium, { color: theme.colors.primary }]}
-        >
-          ${(item.price * item.quantity).toFixed(2)}
-        </Text>
-        <View style={styles.controls}>
-          <View style={styles.quantityControls}>
+    <Surface style={styles.surface} elevation={2}>
+      <View style={styles.container}>
+        <Image source={{ uri: item.image }} style={styles.image} />
+        <View style={styles.details}>
+          <Text 
+            style={[theme.typography.bodyLarge, { color: theme.colors.onSurface }]} 
+            numberOfLines={2}
+          >
+            {item.name}
+          </Text>
+          <Text 
+            style={[theme.typography.titleMedium, { color: theme.colors.primary }]}
+          >
+            ₦{(item.price * item.quantity).toFixed(2)}
+          </Text>
+          <View style={styles.controls}>
+            <View style={styles.quantityControls}>
+              <IconButton
+                icon="minus"
+                size={20}
+                onPress={handleDecrement}
+                disabled={item.quantity <= 1}
+              />
+              <Text style={[theme.typography.bodyLarge, { color: theme.colors.onSurface }]}>
+                {item.quantity}
+              </Text>
+              <IconButton
+                icon="plus"
+                size={20}
+                onPress={handleIncrement}
+              />
+            </View>
             <IconButton
-              icon="minus"
+              icon="delete"
               size={20}
-              onPress={handleDecrement}
-              disabled={item.quantity <= 1}
-            />
-            <Text style={[theme.typography.bodyLarge, { color: theme.colors.onSurface }]}>
-              {item.quantity}
-            </Text>
-            <IconButton
-              icon="plus"
-              size={20}
-              onPress={handleIncrement}
+              iconColor={theme.colors.error}
+              onPress={handleRemove}
             />
           </View>
-          <IconButton
-            icon="delete"
-            size={20}
-            iconColor={theme.colors.error}
-            onPress={handleRemove}
-          />
         </View>
       </View>
-    </View>
+    </Surface>
   );
 };
 
 const styles = StyleSheet.create({
+  surface: {
+    borderRadius: 8,
+  },
   container: {
     flexDirection: 'row',
     padding: spacing.md,
+    overflow: 'hidden',
   },
   image: {
     width: 100,

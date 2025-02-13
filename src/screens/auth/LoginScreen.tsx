@@ -15,7 +15,7 @@ type Props = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
 export default function LoginScreen({ navigation }: Props) {
   const theme = useTheme<CustomTheme>();
-  const { login } = useAuth();
+  const { login, continueAsGuest } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
@@ -39,6 +39,17 @@ export default function LoginScreen({ navigation }: Props) {
     }
   };
 
+  const handleGuestLogin = async () => {
+    try {
+      setLoading(true);
+      await continueAsGuest();
+    } catch (err) {
+      console.error('Failed to continue as guest:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSocialLogin = (platform: string) => {
     // TODO: Implement social login
     console.log(`Login with ${platform}`);
@@ -46,6 +57,16 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <View style={styles.guestButtonContainer}>
+        <Button
+          mode="text"
+          onPress={handleGuestLogin}
+          disabled={loading}
+          labelStyle={{ color: theme.colors.primary }}
+        >
+          Continue as Guest
+        </Button>
+      </View>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -193,6 +214,12 @@ export default function LoginScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  guestButtonContainer: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? spacing.xl * 2 : spacing.xl,
+    right: spacing.md,
+    zIndex: 1,
   },
   keyboardView: {
     flex: 1,

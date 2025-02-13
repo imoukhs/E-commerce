@@ -76,7 +76,7 @@ export default function ProductDetailScreen({ route, navigation }: Props) {
             </View>
 
             <Text style={[theme.typography.titleLarge, styles.price, { color: theme.colors.primary }]}>
-              ${product.price.toFixed(2)}
+              ₦{product.price.toFixed(2)}
             </Text>
 
             <Text style={[theme.typography.bodyLarge, { color: theme.colors.onSurface }]}>

@@ -409,18 +409,18 @@ export default function CheckoutScreen({ navigation }: Props) {
           <View style={styles.summaryRow}>
             <Text style={[styles.reviewText, { color: theme.colors.onSurfaceVariant }]}>Subtotal</Text>
             <Text style={[styles.reviewText, { color: theme.colors.onSurfaceVariant }]}>
-              ${getTotal().toFixed(2)}
+              ₦{getTotal().toFixed(2)}
             </Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={[styles.reviewText, { color: theme.colors.onSurfaceVariant }]}>Shipping</Text>
-            <Text style={[styles.reviewText, { color: theme.colors.onSurfaceVariant }]}>$0.00</Text>
+            <Text style={[styles.reviewText, { color: theme.colors.onSurfaceVariant }]}>₦0.00</Text>
           </View>
           <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
           <View style={[styles.summaryRow, styles.totalRow]}>
             <Text style={[theme.typography.titleMedium, { color: theme.colors.onSurface }]}>Total</Text>
             <Text style={[theme.typography.titleMedium, { color: theme.colors.primary }]}>
-              ${getTotal().toFixed(2)}
+              ₦{getTotal().toFixed(2)}
             </Text>
           </View>
         </Surface>
@@ -477,7 +477,7 @@ export default function CheckoutScreen({ navigation }: Props) {
               loading={loading}
               disabled={loading}
             >
-              Place Order (${getTotal().toFixed(2)})
+              Place Order (₦{getTotal().toFixed(2)})
             </Button>
           )}
         </Surface>

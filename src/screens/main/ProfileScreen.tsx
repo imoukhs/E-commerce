@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, Image, Pressable } from 'react-native';
-import { Text, Surface, Button, List, Switch, useTheme, Divider, Badge } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
+import { Text, Surface, Button, List, useTheme, IconButton, Divider } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { spacing } from '../../theme/spacing';
-import type { CustomTheme } from '../../theme/types';
 import { useAuth } from '../../context/AuthContext';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { MainTabParamList } from '../../navigation/types';
-import { useTheme as useAppTheme } from '../../context/ThemeContext';
+import type { MainStackParamList } from '../../navigation/types';
+import type { CustomTheme } from '../../theme/types';
 
-type Props = NativeStackScreenProps<MainTabParamList, 'Profile'>;
+type Props = NativeStackScreenProps<MainStackParamList, 'Profile'>;
 
 export default function ProfileScreen({ navigation }: Props) {
   const theme = useTheme<CustomTheme>();
   const { user, logout } = useAuth();
-  const { isDarkMode, toggleTheme } = useAppTheme();
   const [isSeller, setIsSeller] = useState(false);
 
   const handleLogout = async () => {
@@ -26,192 +25,190 @@ export default function ProfileScreen({ navigation }: Props) {
     }
   };
 
-  const navigateToScreen = (screenName: keyof MainTabParamList) => {
-    navigation.getParent()?.navigate(screenName);
-  };
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
 
-  const handleBecomeSeller = () => {
-    // TODO: Implement seller onboarding flow
-    setIsSeller(true);
+    if (!result.canceled && result.assets[0].uri) {
+      // TODO: Implement profile picture update
+      console.log('Selected image:', result.assets[0].uri);
+    }
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <ScrollView>
         <Surface style={styles.headerSurface} elevation={1}>
-          <View style={styles.headerContentWrapper}>
+          <View style={styles.headerInner}>
             <View style={styles.headerContent}>
-              <View style={styles.profileInfo}>
-                <Pressable onPress={() => navigation.getParent()?.navigate('EditProfile')}>
-                  <View style={styles.avatarContainer}>
-                    <Image
-                      source={user?.photoURL ? { uri: user.photoURL } : require('../../../assets/defaultAvatar.png')}
-                      style={styles.avatar}
-                    />
-                    <View style={[styles.editBadge, { backgroundColor: theme.colors.primary }]}>
-                      <MaterialCommunityIcons name="pencil" size={12} color={theme.colors.onPrimary} />
-                    </View>
+              <Pressable onPress={pickImage}>
+                <View style={styles.avatarContainer}>
+                  <Image
+                    source={user?.photoURL ? { uri: user.photoURL } : require('../../../assets/defaultAvatar.png')}
+                    style={styles.avatar}
+                  />
+                  <View style={[styles.editBadge, { backgroundColor: theme.colors.primary }]}>
+                    <MaterialCommunityIcons name="camera" size={12} color={theme.colors.onPrimary} />
                   </View>
-                </Pressable>
-                <View style={styles.userInfo}>
-                  <Text style={[theme.typography.titleLarge, { color: theme.colors.onSurface }]}>
-                    {user?.displayName || user?.name || 'User'}
-                  </Text>
-                  <Text style={[theme.typography.bodyMedium, { color: theme.colors.onSurfaceVariant }]}>
-                    {user?.email}
-                  </Text>
-                  {isSeller && (
-                    <Badge style={[styles.sellerBadge, { backgroundColor: theme.colors.primary }]}>
-                      Seller
-                    </Badge>
-                  )}
+                </View>
+              </Pressable>
+              <Text style={[theme.typography.titleLarge, styles.name]}>
+                {user?.displayName || 'User Name'}
+              </Text>
+              <Text style={[theme.typography.bodyMedium, styles.email]}>
+                {user?.email || 'email@example.com'}
+              </Text>
+              <View style={styles.statsContainer}>
+                <View style={styles.statItem}>
+                  <Text style={[theme.typography.titleLarge, styles.statValue]}>12</Text>
+                  <Text style={[theme.typography.bodySmall, styles.statLabel]}>Orders</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={[theme.typography.titleLarge, styles.statValue]}>3</Text>
+                  <Text style={[theme.typography.bodySmall, styles.statLabel]}>Reviews</Text>
+                </View>
+                <View style={styles.statDivider} />
+                <View style={styles.statItem}>
+                  <Text style={[theme.typography.titleLarge, styles.statValue]}>5</Text>
+                  <Text style={[theme.typography.bodySmall, styles.statLabel]}>Wishlist</Text>
                 </View>
               </View>
             </View>
           </View>
         </Surface>
 
-        {!isSeller && (
-          <Surface style={styles.section} elevation={1}>
-            <View style={styles.sectionWrapper}>
-              <View style={styles.sectionContent}>
-                <List.Item
-                  title="Become a Seller"
-                  description="Start selling your products on our platform"
-                  left={props => <List.Icon {...props} icon="store" color={theme.colors.primary} />}
-                  right={props => <List.Icon {...props} icon="chevron-right" />}
-                  onPress={handleBecomeSeller}
-                />
-              </View>
-            </View>
-          </Surface>
-        )}
-
-        <Surface style={styles.section} elevation={1}>
-          <View style={styles.sectionContent}>
+        <Surface style={[styles.sectionSurface, { marginTop: spacing.md }]} elevation={1}>
+          <List.Section>
+            <List.Subheader>Account Settings</List.Subheader>
             <List.Item
-              title="My Orders"
-              left={props => <List.Icon {...props} icon="package-variant" />}
+              title="Edit Profile"
+              left={props => <List.Icon {...props} icon="account-edit" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('OrderHistory')}
+              onPress={() => navigation.navigate('EditProfile')}
             />
-            <Divider style={{ backgroundColor: theme.colors.outline }} />
             <List.Item
               title="Shipping Addresses"
               left={props => <List.Icon {...props} icon="map-marker" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('ShippingAddresses')}
+              onPress={() => navigation.navigate('ShippingAddresses')}
             />
-            <Divider style={{ backgroundColor: theme.colors.outline }} />
             <List.Item
               title="Payment Methods"
               left={props => <List.Icon {...props} icon="credit-card" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('PaymentMethods')}
+              onPress={() => navigation.navigate('PaymentMethods')}
             />
-            <Divider style={{ backgroundColor: theme.colors.outline }} />
+          </List.Section>
+        </Surface>
+
+        <Surface style={[styles.sectionSurface, { marginTop: spacing.md }]} elevation={1}>
+          <List.Section>
+            <List.Subheader>Seller Account</List.Subheader>
+            {isSeller ? (
+              <>
+                <List.Item
+                  title="Seller Dashboard"
+                  description="Manage your store and products"
+                  left={props => <List.Icon {...props} icon="store" />}
+                  right={props => <List.Icon {...props} icon="chevron-right" />}
+                  onPress={() => navigation.navigate('SellerDashboard')}
+                />
+                <List.Item
+                  title="My Products"
+                  description="View and manage your listings"
+                  left={props => <List.Icon {...props} icon="package-variant" />}
+                  right={props => <List.Icon {...props} icon="chevron-right" />}
+                  onPress={() => navigation.navigate('SellerProducts')}
+                />
+                <List.Item
+                  title="Sales Analytics"
+                  description="View your sales performance"
+                  left={props => <List.Icon {...props} icon="chart-line" />}
+                  right={props => <List.Icon {...props} icon="chevron-right" />}
+                  onPress={() => navigation.navigate('SellerAnalytics')}
+                />
+              </>
+            ) : (
+              <View style={styles.becomeSellerContainer}>
+                <Text style={[theme.typography.bodyMedium, styles.becomeSellerText]}>
+                  Start selling your products on our marketplace
+                </Text>
+                <Button
+                  mode="contained"
+                  icon="store-plus"
+                  onPress={() => navigation.navigate('BecomeSeller')}
+                  style={styles.becomeSellerButton}
+                >
+                  Become a Vendor
+                </Button>
+              </View>
+            )}
+          </List.Section>
+        </Surface>
+
+        <Surface style={[styles.sectionSurface, { marginTop: spacing.md }]} elevation={1}>
+          <List.Section>
+            <List.Subheader>Shopping</List.Subheader>
+            <List.Item
+              title="Order History"
+              left={props => <List.Icon {...props} icon="history" />}
+              right={props => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => navigation.navigate('OrderHistory')}
+            />
             <List.Item
               title="My Reviews"
               left={props => <List.Icon {...props} icon="star" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('Reviews')}
+              onPress={() => navigation.navigate('Reviews')}
             />
-          </View>
+            <List.Item
+              title="Wishlist"
+              left={props => <List.Icon {...props} icon="heart" />}
+              right={props => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => {}}
+            />
+          </List.Section>
         </Surface>
 
-        {isSeller && (
-          <Surface style={styles.section} elevation={1}>
-            <View style={styles.sectionContent}>
-              <List.Item
-                title="My Store"
-                left={props => <List.Icon {...props} icon="store" />}
-                right={props => <List.Icon {...props} icon="chevron-right" />}
-                onPress={() => {/* TODO: Navigate to seller dashboard */}}
-              />
-              <Divider style={{ backgroundColor: theme.colors.outline }} />
-              <List.Item
-                title="Products"
-                left={props => <List.Icon {...props} icon="package" />}
-                right={props => <List.Icon {...props} icon="chevron-right" />}
-                onPress={() => {/* TODO: Navigate to seller products */}}
-              />
-              <Divider style={{ backgroundColor: theme.colors.outline }} />
-              <List.Item
-                title="Orders"
-                left={props => <List.Icon {...props} icon="receipt" />}
-                right={props => <List.Icon {...props} icon="chevron-right" />}
-                onPress={() => {/* TODO: Navigate to seller orders */}}
-              />
-              <Divider style={{ backgroundColor: theme.colors.outline }} />
-              <List.Item
-                title="Analytics"
-                left={props => <List.Icon {...props} icon="chart-bar" />}
-                right={props => <List.Icon {...props} icon="chevron-right" />}
-                onPress={() => {/* TODO: Navigate to seller analytics */}}
-              />
-            </View>
-          </Surface>
-        )}
-
-        <Surface style={styles.section} elevation={1}>
-          <View style={styles.sectionContent}>
+        <Surface style={[styles.sectionSurface, { marginTop: spacing.md }]} elevation={1}>
+          <List.Section>
+            <List.Subheader>Preferences</List.Subheader>
             <List.Item
-              title="Dark Mode"
-              left={props => <List.Icon {...props} icon="theme-light-dark" />}
-              right={() => <Switch value={isDarkMode} onValueChange={toggleTheme} />}
-            />
-            <Divider style={{ backgroundColor: theme.colors.outline }} />
-            <List.Item
-              title="Language"
-              left={props => <List.Icon {...props} icon="translate" />}
+              title="Settings"
+              left={props => <List.Icon {...props} icon="cog" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('Language')}
+              onPress={() => navigation.navigate('Settings')}
             />
-            <Divider style={{ backgroundColor: theme.colors.outline }} />
-            <List.Item
-              title="Notifications"
-              left={props => <List.Icon {...props} icon="bell-outline" />}
-              right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('Notifications')}
-            />
-          </View>
-        </Surface>
-
-        <Surface style={styles.section} elevation={1}>
-          <View style={styles.sectionContent}>
-            <List.Item
-              title="Privacy & Security"
-              left={props => <List.Icon {...props} icon="shield-outline" />}
-              right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('PrivacySecurity')}
-            />
-            <Divider style={{ backgroundColor: theme.colors.outline }} />
             <List.Item
               title="Help Center"
-              left={props => <List.Icon {...props} icon="help-circle-outline" />}
+              left={props => <List.Icon {...props} icon="help-circle" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('HelpCenter')}
+              onPress={() => navigation.navigate('HelpCenter')}
             />
-            <Divider style={{ backgroundColor: theme.colors.outline }} />
             <List.Item
               title="About"
-              left={props => <List.Icon {...props} icon="information-outline" />}
+              left={props => <List.Icon {...props} icon="information" />}
               right={props => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => navigation.getParent()?.navigate('About')}
+              onPress={() => navigation.navigate('About')}
             />
-          </View>
+          </List.Section>
         </Surface>
 
-        <Button
-          mode="contained"
-          onPress={handleLogout}
-          style={[styles.logoutButton, { backgroundColor: theme.colors.error }]}
-          contentStyle={styles.buttonContent}
-          labelStyle={{ color: theme.colors.onError }}
-          icon="logout"
-        >
-          Logout
-        </Button>
+        <View style={styles.logoutContainer}>
+          <Button
+            mode="outlined"
+            onPress={handleLogout}
+            style={styles.logoutButton}
+            icon="logout"
+          >
+            Log Out
+          </Button>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -225,57 +222,85 @@ const styles = StyleSheet.create({
     margin: spacing.md,
     borderRadius: 16,
   },
-  headerContentWrapper: {
+  headerInner: {
     borderRadius: 16,
   },
   headerContent: {
     padding: spacing.lg,
-  },
-  profileInfo: {
-    flexDirection: 'row',
     alignItems: 'center',
+    overflow: 'hidden',
+    borderRadius: 16,
   },
   avatarContainer: {
     position: 'relative',
+    marginBottom: spacing.md,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
   editBadge: {
     position: 'absolute',
     bottom: 0,
     right: 0,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  userInfo: {
-    marginLeft: spacing.md,
-    flex: 1,
+  name: {
+    marginBottom: spacing.xs,
   },
-  sellerBadge: {
-    marginTop: spacing.xs,
-    alignSelf: 'flex-start',
+  email: {
+    marginBottom: spacing.md,
+    opacity: 0.7,
   },
-  section: {
-    margin: spacing.md,
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    paddingVertical: spacing.md,
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statValue: {
+    fontWeight: 'bold',
+    marginBottom: spacing.xs,
+  },
+  statLabel: {
+    opacity: 0.7,
+  },
+  statDivider: {
+    width: 1,
+    height: '100%',
+    opacity: 0.2,
+    backgroundColor: 'gray',
+  },
+  sectionSurface: {
+    marginHorizontal: spacing.md,
     borderRadius: 16,
+    overflow: 'hidden',
   },
-  sectionWrapper: {
-    borderRadius: 16,
-  },
-  sectionContent: {
-    borderRadius: 16,
+  logoutContainer: {
+    padding: spacing.lg,
   },
   logoutButton: {
-    margin: spacing.md,
-    marginTop: spacing.lg,
+    borderRadius: 8,
   },
-  buttonContent: {
-    paddingVertical: spacing.sm,
+  becomeSellerContainer: {
+    padding: spacing.lg,
+    alignItems: 'center',
+  },
+  becomeSellerText: {
+    textAlign: 'center',
+    marginBottom: spacing.md,
+    opacity: 0.7,
+  },
+  becomeSellerButton: {
+    borderRadius: 8,
+    paddingHorizontal: spacing.lg,
   },
 }); 

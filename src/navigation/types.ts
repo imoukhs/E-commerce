@@ -28,6 +28,7 @@ export type AuthStackParamList = {
 
 export type MainStackParamList = {
   MainTabs: undefined;
+  Profile: undefined;
   ProductDetail: {
     product: {
       id: string;
@@ -52,6 +53,22 @@ export type MainStackParamList = {
   PrivacySecurity: undefined;
   HelpCenter: undefined;
   About: undefined;
+  Search: undefined;
+  ShippingAddresses: undefined;
+  PaymentMethods: undefined;
+  Reviews: undefined;
+  ContactUs: undefined;
+  // Seller related screens
+  BecomeSeller: undefined;
+  SellerDashboard: undefined;
+  SellerProducts: undefined;
+  SellerAnalytics: undefined;
+  // Product Management
+  ProductManagement: undefined;
+  AddProduct: undefined;
+  EditProduct: {
+    productId: string;
+  };
 };
 
 export type MainTabParamList = {

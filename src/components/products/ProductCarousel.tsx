@@ -47,7 +47,7 @@ export default function ProductCarousel({ products }: Props) {
               <View style={styles.itemContainer}>
                 <Pressable
                   style={styles.pressable}
-                  onPress={() => navigation.navigate('ProductDetail', { product })}
+                  onPress={() => navigation.navigate('ProductDetail', { product: { ...product, category: 'default' } })}
                 >
                   <Image source={{ uri: product.image }} style={styles.image} />
                   <View style={styles.overlay}>
@@ -55,11 +55,11 @@ export default function ProductCarousel({ products }: Props) {
                       <Text style={[theme.typography.h3, styles.name]} numberOfLines={2}>
                         {product.name}
                       </Text>
-                      <Text style={[theme.typography.body, styles.description]} numberOfLines={2}>
+                      <Text style={[theme.typography.bodyMedium, styles.description]} numberOfLines={2}>
                         {product.description}
                       </Text>
                       <Text style={[theme.typography.h2, styles.price]}>
-                        ${product.price.toFixed(2)}
+                        ₦{product.price.toFixed(2)}
                       </Text>
                     </View>
                   </View>

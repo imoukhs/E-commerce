@@ -13,7 +13,7 @@ import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { createNavigationTheme } from './src/theme/navigationTheme';
 
 const AppContent = () => {
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const { theme, isDarkMode } = useTheme();
   const fontsLoaded = useFonts();
   const navigationTheme = createNavigationTheme(theme);
@@ -26,7 +26,7 @@ const AppContent = () => {
     <PaperProvider theme={theme}>
       <NavigationContainer theme={navigationTheme}>
         <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-        {isAuthenticated ? <MainNavigator /> : <AuthNavigator />}
+        {user ? <MainNavigator /> : <AuthNavigator />}
       </NavigationContainer>
     </PaperProvider>
   );

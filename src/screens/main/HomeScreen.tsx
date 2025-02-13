@@ -100,74 +100,78 @@ export default function HomeScreen({ navigation }: Props) {
         </View>
 
         <Surface style={styles.specialOffersSurface} elevation={1}>
-          <View style={styles.specialOffersContent}>
-            <View style={styles.sectionHeader}>
-              <Text style={[theme.typography.titleLarge, { color: theme.colors.onSurface }]}>
-                Special Offers
-              </Text>
-              <Button mode="text" onPress={() => {}}>See All</Button>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.specialOffersContainer}
-            >
-              {SPECIAL_OFFERS.map((offer) => (
-                <Pressable
-                  key={offer.id}
-                  onPress={() => handleSpecialOfferPress(offer)}
-                >
-                  <LinearGradient
-                    colors={[theme.colors.primary, theme.colors.primaryContainer]}
-                    style={styles.specialOfferCard}
+          <View style={styles.specialOffersInner}>
+            <View style={styles.specialOffersContent}>
+              <View style={styles.sectionHeader}>
+                <Text style={[theme.typography.titleLarge, { color: theme.colors.onSurface }]}>
+                  Special Offers
+                </Text>
+                <Button mode="text" onPress={() => {}}>See All</Button>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.specialOffersContainer}
+              >
+                {SPECIAL_OFFERS.map((offer) => (
+                  <Pressable
+                    key={offer.id}
+                    onPress={() => handleSpecialOfferPress(offer)}
                   >
-                    <Text style={[theme.typography.titleMedium, { color: theme.colors.onPrimary }]}>
-                      {offer.name}
-                    </Text>
-                    <Text style={[theme.typography.bodySmall, { color: theme.colors.onPrimary }]}>
-                      {offer.discount}
-                    </Text>
-                    <Text style={[theme.typography.bodySmall, { color: theme.colors.onPrimary }]}>
-                      Ends {new Date(offer.endDate).toLocaleDateString()}
-                    </Text>
-                  </LinearGradient>
-                </Pressable>
-              ))}
-            </ScrollView>
+                    <LinearGradient
+                      colors={[theme.colors.primary, theme.colors.primaryContainer]}
+                      style={styles.specialOfferCard}
+                    >
+                      <Text style={[theme.typography.titleMedium, { color: theme.colors.onPrimary }]}>
+                        {offer.name}
+                      </Text>
+                      <Text style={[theme.typography.bodySmall, { color: theme.colors.onPrimary }]}>
+                        {offer.discount}
+                      </Text>
+                      <Text style={[theme.typography.bodySmall, { color: theme.colors.onPrimary }]}>
+                        Ends {new Date(offer.endDate).toLocaleDateString()}
+                      </Text>
+                    </LinearGradient>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
           </View>
         </Surface>
 
         <Surface style={styles.recentSurface} elevation={1}>
-          <View style={styles.recentContent}>
-            <View style={styles.sectionHeader}>
-              <Text style={[theme.typography.titleLarge, { color: theme.colors.onSurface }]}>
-                Recent Products
-              </Text>
-              <Button mode="text" onPress={() => {}}>See All</Button>
+          <View style={styles.recentInner}>
+            <View style={styles.recentContent}>
+              <View style={styles.sectionHeader}>
+                <Text style={[theme.typography.titleLarge, { color: theme.colors.onSurface }]}>
+                  Recent Products
+                </Text>
+                <Button mode="text" onPress={() => {}}>See All</Button>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.recentProductsContainer}
+              >
+                {RECENT_PRODUCTS.map((product) => (
+                  <Pressable
+                    key={product.id}
+                    style={[styles.recentProductCard, { backgroundColor: theme.colors.surface }]}
+                    onPress={() => navigation.getParent()?.navigate('ProductDetail', { product })}
+                  >
+                    <Image source={{ uri: product.image }} style={styles.recentProductImage} />
+                    <View style={styles.recentProductInfo}>
+                      <Text style={[theme.typography.bodyMedium, styles.recentProductName, { color: theme.colors.onSurface }]} numberOfLines={2}>
+                        {product.name}
+                      </Text>
+                      <Text style={[theme.typography.titleMedium, styles.recentProductPrice, { color: theme.colors.primary }]}>
+                        ₦{product.price.toFixed(2)}
+                      </Text>
+                    </View>
+                  </Pressable>
+                ))}
+              </ScrollView>
             </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.recentProductsContainer}
-            >
-              {RECENT_PRODUCTS.map((product) => (
-                <Pressable
-                  key={product.id}
-                  style={[styles.recentProductCard, { backgroundColor: theme.colors.surface }]}
-                  onPress={() => navigation.getParent()?.navigate('ProductDetail', { product })}
-                >
-                  <Image source={{ uri: product.image }} style={styles.recentProductImage} />
-                  <View style={styles.recentProductInfo}>
-                    <Text style={[theme.typography.bodyMedium, styles.recentProductName, { color: theme.colors.onSurface }]} numberOfLines={2}>
-                      {product.name}
-                    </Text>
-                    <Text style={[theme.typography.titleMedium, styles.recentProductPrice, { color: theme.colors.primary }]}>
-                      ${product.price.toFixed(2)}
-                    </Text>
-                  </View>
-                </Pressable>
-              ))}
-            </ScrollView>
           </View>
         </Surface>
       </ScrollView>
@@ -195,17 +199,14 @@ const styles = StyleSheet.create({
   },
   specialOffersSurface: {
     marginBottom: spacing.lg,
+    borderRadius: 16,
+  },
+  specialOffersInner: {
+    borderRadius: 16,
   },
   specialOffersContent: {
-    borderRadius: 16,
     overflow: 'hidden',
-  },
-  recentSurface: {
-    marginBottom: spacing.lg,
-  },
-  recentContent: {
     borderRadius: 16,
-    overflow: 'hidden',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -228,6 +229,17 @@ const styles = StyleSheet.create({
     marginRight: spacing.md,
     borderRadius: 12,
     overflow: 'hidden',
+  },
+  recentSurface: {
+    marginBottom: spacing.lg,
+    borderRadius: 16,
+  },
+  recentInner: {
+    borderRadius: 16,
+  },
+  recentContent: {
+    overflow: 'hidden',
+    borderRadius: 16,
   },
   recentProductsContainer: {
     padding: spacing.md,

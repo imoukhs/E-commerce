@@ -1,158 +1,260 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { Text, useTheme, Surface, IconButton } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View, ScrollView, StyleSheet, Pressable, Image } from 'react-native';
+import { Text, Surface, Chip, useTheme, Badge, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../../theme/colors';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { spacing } from '../../theme/spacing';
 import type { CustomTheme } from '../../theme/types';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import type { MainStackParamList } from '../../navigation/MainNavigator';
+import type { MainStackParamList } from '../../navigation/types';
 
-// Mock data for orders
-const MOCK_ORDERS = [
+type Props = NativeStackScreenProps<MainStackParamList, 'OrderHistory'>;
+
+type OrderStatus = 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+
+interface OrderItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  image: string;
+}
+
+interface Order {
+  id: string;
+  date: string;
+  status: OrderStatus;
+  items: OrderItem[];
+  total: number;
+  trackingNumber?: string;
+}
+
+// Mock data
+const MOCK_ORDERS: Order[] = [
   {
-    id: 'ORD1234567',
-    date: '2024-03-15',
+    id: 'ORD001',
+    date: '2024-03-20',
     status: 'delivered',
-    total: 299.99,
     items: [
-      { name: 'Product 1', quantity: 2, price: 99.99 },
-      { name: 'Product 2', quantity: 1, price: 100.01 },
+      {
+        id: '1',
+        name: 'Wireless Earbuds',
+        quantity: 1,
+        price: 99.99,
+        image: 'https://via.placeholder.com/100',
+      },
+      {
+        id: '2',
+        name: 'Smart Watch',
+        quantity: 1,
+        price: 199.99,
+        image: 'https://via.placeholder.com/100',
+      },
     ],
+    total: 299.98,
+    trackingNumber: 'TRK123456789',
   },
   {
-    id: 'ORD7654321',
-    date: '2024-03-14',
-    status: 'processing',
-    total: 149.99,
+    id: 'ORD002',
+    date: '2024-03-18',
+    status: 'shipped',
     items: [
-      { name: 'Product 3', quantity: 1, price: 149.99 },
+      {
+        id: '3',
+        name: 'Bluetooth Speaker',
+        quantity: 1,
+        price: 79.99,
+        image: 'https://via.placeholder.com/100',
+      },
     ],
+    total: 79.99,
+    trackingNumber: 'TRK987654321',
   },
   // Add more mock orders as needed
 ];
 
-type Props = NativeStackScreenProps<MainStackParamList>;
-
 export default function OrderHistoryScreen({ navigation }: Props) {
   const theme = useTheme<CustomTheme>();
+  const [selectedFilter, setSelectedFilter] = useState<OrderStatus | 'all'>('all');
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: OrderStatus) => {
     switch (status) {
-      case 'delivered':
-        return colors.light.secondary;
+      case 'pending':
+        return '#FFA000';
       case 'processing':
-        return colors.light.primary;
+        return '#1976D2';
+      case 'shipped':
+        return '#7B1FA2';
+      case 'delivered':
+        return '#43A047';
       case 'cancelled':
-        return colors.light.error;
+        return '#D32F2F';
       default:
-        return colors.light.onSurfaceVariant;
+        return theme.colors.primary;
+    }
+  };
+
+  const getStatusIcon = (status: OrderStatus) => {
+    switch (status) {
+      case 'pending':
+        return 'clock-outline';
+      case 'processing':
+        return 'progress-check';
+      case 'shipped':
+        return 'truck-delivery';
+      case 'delivered':
+        return 'check-circle';
+      case 'cancelled':
+        return 'close-circle';
+      default:
+        return 'information';
     }
   };
 
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
+    return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+    });
   };
 
+  const filteredOrders = MOCK_ORDERS.filter(
+    order => selectedFilter === 'all' || order.status === selectedFilter
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.background }]} edges={['top']}>
       <View style={styles.header}>
-        <IconButton
-          icon="arrow-left"
-          size={24}
-          onPress={() => navigation.goBack()}
-        />
-        <Text style={[theme.typography.h2, styles.headerTitle]}>Order History</Text>
-        <View style={styles.placeholder} />
+        <Text style={[theme.typography.titleLarge, styles.title]}>Order History</Text>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.filtersContainer}
+          contentContainerStyle={styles.filters}
+        >
+          <Chip
+            selected={selectedFilter === 'all'}
+            onPress={() => setSelectedFilter('all')}
+            style={styles.filterChip}
+          >
+            All
+          </Chip>
+          {['pending', 'processing', 'shipped', 'delivered', 'cancelled'].map((status) => (
+            <Chip
+              key={status}
+              selected={selectedFilter === status}
+              onPress={() => setSelectedFilter(status as OrderStatus)}
+              style={styles.filterChip}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </Chip>
+          ))}
+        </ScrollView>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        {MOCK_ORDERS.map((order) => (
-          <Surface key={order.id} style={styles.orderCard}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.orderCardContent,
-                pressed && { opacity: 0.7 },
-              ]}
-              android_ripple={{ color: theme.colors.onSurfaceVariant }}
-            >
-              <View style={styles.orderHeader}>
-                <View>
-                  <Text style={[theme.typography.bodyMedium, styles.orderId]}>
-                    Order #{order.id}
-                  </Text>
-                  <Text style={[theme.typography.bodyMedium, styles.orderDate]}>
-                    {formatDate(order.date)}
-                  </Text>
-                </View>
-                <View style={[
-                  styles.statusBadge,
-                  { backgroundColor: getStatusColor(order.status) + '20' },
-                ]}>
-                  <Text style={[
-                    theme.typography.caption,
-                    styles.statusText,
-                    { color: getStatusColor(order.status) },
-                  ]}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                  </Text>
-                </View>
-              </View>
-
-              <View style={styles.itemsList}>
-                {order.items.map((item, index) => (
-                  <View key={index} style={styles.itemRow}>
-                    <View style={styles.itemInfo}>
-                      <Text style={[theme.typography.bodyMedium, styles.itemName]}>
-                        {item.name}
-                      </Text>
-                      <Text style={[theme.typography.bodyMedium, styles.itemQuantity]}>
-                        Quantity: {item.quantity}
-                      </Text>
-                    </View>
-                    <Text style={[theme.typography.bodyMedium, styles.itemPrice]}>
-                      ${item.price.toFixed(2)}
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {filteredOrders.map((order) => (
+          <Surface key={order.id} style={styles.orderCard} elevation={1}>
+            <View style={styles.orderWrapper}>
+              <View style={styles.orderContent}>
+                <View style={styles.orderHeader}>
+                  <View>
+                    <Text style={[theme.typography.titleMedium, styles.orderId]}>
+                      Order #{order.id}
+                    </Text>
+                    <Text style={[theme.typography.bodySmall, { color: theme.colors.onSurfaceVariant }]}>
+                      {formatDate(order.date)}
                     </Text>
                   </View>
-                ))}
-              </View>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      { backgroundColor: getStatusColor(order.status) + '20' }
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name={getStatusIcon(order.status)}
+                      size={14}
+                      color={getStatusColor(order.status)}
+                      style={styles.statusIcon}
+                    />
+                    <Text style={[
+                      styles.statusText,
+                      { color: getStatusColor(order.status) }
+                    ]}>
+                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    </Text>
+                  </View>
+                </View>
 
-              <View style={styles.orderFooter}>
-                <Text style={[theme.typography.bodyMedium, styles.totalLabel]}>
-                  Total Amount:
-                </Text>
-                <Text style={[theme.typography.h3, styles.totalAmount]}>
-                  ${order.total.toFixed(2)}
-                </Text>
-              </View>
+                <View style={styles.itemsContainer}>
+                  {order.items.map((item, index) => (
+                    <View key={item.id} style={styles.orderItem}>
+                      <Image source={{ uri: item.image }} style={styles.itemImage} />
+                      <View style={styles.itemDetails}>
+                        <Text style={theme.typography.bodyMedium} numberOfLines={1}>
+                          {item.name}
+                        </Text>
+                        <Text style={[theme.typography.bodySmall, { color: theme.colors.onSurfaceVariant }]}>
+                          Qty: {item.quantity} × ₦{item.price.toFixed(2)}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
 
-              <View style={styles.actionButtons}>
-                <IconButton
-                  icon="receipt-outline"
-                  size={20}
-                  onPress={() => {}}
-                  style={styles.actionButton}
-                />
-                <IconButton
-                  icon="chatbubble-outline"
-                  size={20}
-                  onPress={() => {}}
-                  style={styles.actionButton}
-                />
-                <IconButton
-                  icon="share-outline"
-                  size={20}
-                  onPress={() => {}}
-                  style={styles.actionButton}
-                />
+                <View style={styles.orderFooter}>
+                  <View style={styles.totalContainer}>
+                    <Text style={[theme.typography.bodyMedium, { color: theme.colors.onSurfaceVariant }]}>
+                      Total
+                    </Text>
+                    <Text style={[theme.typography.titleMedium, { color: theme.colors.primary }]}>
+                      ₦{order.total.toFixed(2)}
+                    </Text>
+                  </View>
+                  {order.trackingNumber && (
+                    <View style={styles.trackingContainer}>
+                      <MaterialCommunityIcons
+                        name="truck-delivery-outline"
+                        size={16}
+                        color={theme.colors.primary}
+                      />
+                      <Text style={[
+                        theme.typography.bodySmall,
+                        styles.trackingNumber,
+                        { color: theme.colors.primary }
+                      ]}>
+                        {order.trackingNumber}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+
+                <View style={styles.actionsContainer}>
+                  <IconButton
+                    icon="eye"
+                    mode="outlined"
+                    size={20}
+                    onPress={() => navigation.navigate('OrderDetail', { orderId: order.id })}
+                  />
+                  {order.status === 'delivered' && (
+                    <IconButton
+                      icon="star-outline"
+                      mode="outlined"
+                      size={20}
+                      onPress={() => {/* TODO: Navigate to review screen */}}
+                    />
+                  )}
+                  <IconButton
+                    icon="chat-outline"
+                    mode="outlined"
+                    size={20}
+                    onPress={() => {/* TODO: Navigate to support chat */}}
+                  />
+                </View>
               </View>
-            </Pressable>
+            </View>
           </Surface>
         ))}
       </ScrollView>
@@ -163,97 +265,99 @@ export default function OrderHistoryScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.light.background,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing.sm,
+    padding: spacing.md,
   },
-  headerTitle: {
-    color: colors.light.onSurface,
+  title: {
+    marginBottom: spacing.sm,
   },
-  placeholder: {
-    width: 48,
+  filtersContainer: {
+    marginBottom: spacing.md,
+  },
+  filters: {
+    paddingRight: spacing.md,
+    gap: spacing.sm,
+  },
+  filterChip: {
+    marginRight: spacing.xs,
   },
   content: {
+    flex: 1,
     padding: spacing.md,
   },
   orderCard: {
     marginBottom: spacing.md,
-    borderRadius: 12,
-    overflow: 'hidden',
+    borderRadius: 16,
   },
-  orderCardContent: {
+  orderWrapper: {
+    borderRadius: 16,
+  },
+  orderContent: {
     padding: spacing.md,
   },
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: spacing.md,
   },
   orderId: {
-    color: colors.light.onSurface,
-    fontWeight: 'bold',
-  },
-  orderDate: {
-    color: colors.light.onSurfaceVariant,
+    marginBottom: spacing.xs,
   },
   statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingVertical: 4,
     borderRadius: 12,
   },
+  statusIcon: {
+    marginRight: spacing.xs,
+  },
   statusText: {
-    fontWeight: 'bold',
+    fontSize: 12,
+    fontWeight: '500',
   },
-  itemsList: {
+  itemsContainer: {
+    marginBottom: spacing.md,
+  },
+  orderItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+  },
+  itemImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    marginRight: spacing.sm,
+  },
+  itemDetails: {
+    flex: 1,
+  },
+  orderFooter: {
     borderTopWidth: 1,
-    borderTopColor: colors.light.outline,
+    borderTopColor: 'rgba(0, 0, 0, 0.1)',
     paddingTop: spacing.md,
+    marginBottom: spacing.md,
   },
-  itemRow: {
+  totalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.sm,
   },
-  itemInfo: {
-    flex: 1,
-    marginRight: spacing.md,
-  },
-  itemName: {
-    color: colors.light.onSurface,
-  },
-  itemQuantity: {
-    color: colors.light.onSurfaceVariant,
-  },
-  itemPrice: {
-    color: colors.light.primary,
-  },
-  orderFooter: {
+  trackingContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.light.outline,
   },
-  totalLabel: {
-    color: colors.light.onSurfaceVariant,
+  trackingNumber: {
+    marginLeft: spacing.xs,
   },
-  totalAmount: {
-    color: colors.light.primary,
-  },
-  actionButtons: {
+  actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    marginTop: spacing.sm,
-  },
-  actionButton: {
-    margin: 0,
+    gap: spacing.sm,
   },
 }); 

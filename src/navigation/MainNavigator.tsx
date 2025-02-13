@@ -24,6 +24,9 @@ import LanguageScreen from '../screens/main/LanguageScreen';
 import HelpCenterScreen from '../screens/main/HelpCenterScreen';
 import ContactUsScreen from '../screens/main/ContactUsScreen';
 import AboutScreen from '../screens/main/AboutScreen';
+import BecomeSeller from '../screens/seller/BecomeSeller';
+import ProductManagementScreen from '../screens/seller/ProductManagementScreen';
+import AddProductScreen from '../screens/seller/AddProductScreen';
 import type { MainStackParamList, MainTabParamList } from './types';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -50,94 +53,29 @@ export function MainNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerShown: true,
+        headerShown: false
       }}
     >
-      <Stack.Screen
-        name="MainTabs"
-        component={MainTabNavigator}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ProductDetail"
-        component={ProductDetailScreen}
-        options={{ title: 'Product Details' }}
-      />
-      <Stack.Screen
-        name="OrderHistory"
-        component={OrderHistoryScreen}
-        options={{ title: 'Order History' }}
-      />
-      <Stack.Screen
-        name="Search"
-        component={SearchScreen}
-        options={{ title: 'Search' }}
-      />
-      <Stack.Screen
-        name="Cart"
-        component={CartScreen}
-        options={{ title: 'Shopping Cart' }}
-      />
-      <Stack.Screen
-        name="Checkout"
-        component={CheckoutScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EditProfile"
-        component={EditProfileScreen}
-        options={{ title: 'Edit Profile' }}
-      />
-      <Stack.Screen
-        name="ShippingAddresses"
-        component={ShippingAddressesScreen}
-        options={{ title: 'Shipping Addresses' }}
-      />
-      <Stack.Screen
-        name="PaymentMethods"
-        component={PaymentMethodsScreen}
-        options={{ title: 'Payment Methods' }}
-      />
-      <Stack.Screen
-        name="Reviews"
-        component={ReviewsScreen}
-        options={{ title: 'My Reviews' }}
-      />
-      <Stack.Screen
-        name="Settings"
-        component={SettingsScreen}
-        options={{ title: 'Settings' }}
-      />
-      <Stack.Screen
-        name="Notifications"
-        component={NotificationsScreen}
-        options={{ title: 'Notifications' }}
-      />
-      <Stack.Screen
-        name="PrivacySecurity"
-        component={PrivacySecurityScreen}
-        options={{ title: 'Privacy & Security' }}
-      />
-      <Stack.Screen
-        name="Language"
-        component={LanguageScreen}
-        options={{ title: 'Language' }}
-      />
-      <Stack.Screen
-        name="HelpCenter"
-        component={HelpCenterScreen}
-        options={{ title: 'Help Center' }}
-      />
-      <Stack.Screen
-        name="ContactUs"
-        component={ContactUsScreen}
-        options={{ title: 'Contact Us' }}
-      />
-      <Stack.Screen
-        name="About"
-        component={AboutScreen}
-        options={{ title: 'About' }}
-      />
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+      <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+      <Stack.Screen name="OrderHistory" component={OrderHistoryScreen} />
+      <Stack.Screen name="Search" component={SearchScreen} />
+      <Stack.Screen name="Cart" component={CartScreen} />
+      <Stack.Screen name="Checkout" component={CheckoutScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="ShippingAddresses" component={ShippingAddressesScreen} />
+      <Stack.Screen name="PaymentMethods" component={PaymentMethodsScreen} />
+      <Stack.Screen name="Reviews" component={ReviewsScreen} />
+      <Stack.Screen name="Settings" component={SettingsScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="PrivacySecurity" component={PrivacySecurityScreen} />
+      <Stack.Screen name="Language" component={LanguageScreen} />
+      <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
+      <Stack.Screen name="ContactUs" component={ContactUsScreen} />
+      <Stack.Screen name="About" component={AboutScreen} />
+      <Stack.Screen name="BecomeSeller" component={BecomeSeller} />
+      <Stack.Screen name="ProductManagement" component={ProductManagementScreen} />
+      <Stack.Screen name="AddProduct" component={AddProductScreen} />
     </Stack.Navigator>
   );
 } 
