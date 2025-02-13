@@ -1,4 +1,4 @@
-﻿# E-commerce
+﻿# E-commerce Mobile App
 # Redeemer's Marketplace
 
 A modern, cross-platform e-commerce application built with React Native Expo offers a seamless shopping experience for buyers and sellers.
@@ -107,7 +107,7 @@ expo start
 # Run on iOS simulator
 expo run:ios
 
-# Run on Android emulator
+# Run on an Android emulator
 expo run:android
 \`\`\`
 
@@ -141,7 +141,7 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## 📞 Support
 
-For support, email support@redeemersmarketplace.com or join our Slack channel.
+For support, email kingojoimoukhuede@gmail.com 
 
 ---
 
