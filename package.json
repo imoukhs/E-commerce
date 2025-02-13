@@ -1,13 +1,32 @@
 {
   "name": "redeemers-marketplace",
   "version": "1.0.0",
-  "main": "index.ts",
+  "description": "A modern, cross-platform e-commerce application built with React Native Expo",
+  "main": "App.tsx",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/redeemers-marketplace.git"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "e-commerce",
+    "marketplace",
+    "mobile-app"
+  ],
+  "author": "Redeemer's Marketplace Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yourusername/redeemers-marketplace/issues"
+  },
+  "homepage": "https://github.com/yourusername/redeemers-marketplace#readme",
   "dependencies": {
     "@expo-google-fonts/open-sans": "^0.2.3",
     "@expo-google-fonts/roboto": "^0.2.3",
